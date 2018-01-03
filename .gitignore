@@ -1,0 +1,4 @@
+/vendor/
+/workspace/*
+!/workspace
+!/workspace/.gitkeep
