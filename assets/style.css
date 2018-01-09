@@ -158,3 +158,11 @@ td.console {
   background: rgba(20,20,30, 0.8);
   padding: 0.3em;
 }
+
+li.passed {
+    background: linear-gradient(to right,#39aa56 0,#39aa56 10px,#fff 10px,#fff 100%) no-repeat;
+}
+
+li.failed {
+    background: linear-gradient(to right,#db4545 0,#db4545 10px,#fff 10px,#fff 100%) no-repeat;
+}

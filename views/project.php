@@ -21,11 +21,11 @@
       <tr>
         <td>
           <ul class="list-group">
-            <li class="list-group-item"><a href="/projects/symfony/yaml/builds/current">symfony/yaml</a></li>
-            <li class="list-group-item"><a href="/projects/psy/psysh/builds/current">psy/psysh</a></li>
-            <li class="list-group-item"><a href="/projects/block8/phpci/builds/current">block8/phpci</a></li>
-            <li class="list-group-item"><a href="/projects/phpstan/phpstan/builds/current">phpstan/phpstan</a></li>
-            <li class="list-group-item"><a href="/projects/squizlabs/php_codesniffer/builds/current">squizlabs/php_codesniffer</a></li>
+            <li class="list-group-item passed">master <a href="/projects/<?= $owner.'/'.$project; ?>/builds/5">#5</a></li>
+            <li class="list-group-item failed">v1.0.1 <a href="/projects/<?= $owner.'/'.$project; ?>/builds/4">#4</a></li>
+            <li class="list-group-item failed">master <a href="/projects/<?= $owner.'/'.$project; ?>/builds/3">#3</a></li>
+            <li class="list-group-item passed">develop <a href="/projects/<?= $owner.'/'.$project; ?>/builds/2">#2</a></li>
+            <li class="list-group-item passed">poc <a href="/projects/<?= $owner.'/'.$project; ?>/builds/1">#1</a></li>
           </ul>
         </td>
         <td colspan="4" class="console">
