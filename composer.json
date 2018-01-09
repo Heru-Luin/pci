@@ -22,5 +22,8 @@
         "psr-4": {
             "": "src/"
         }
+    },
+    "scripts": {
+        "server": "php -S localhost:9001 -d display_errors=1"
     }
 }
