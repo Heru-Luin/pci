@@ -7,12 +7,12 @@
   <script src="/assets/script.js"></script>
 </head>
 <body>
-  <?php include 'header.php';?>
-  <span><?php echo $owner.'/'.$project; ?></span> <img src="/assets/passing.svg" />
+  <?php include 'header.php';?>  
   
   <table>
     <tbody>
       <tr>
+        <td><span><?php echo $owner.'/'.$project; ?></span> <img src="/assets/passing.svg" /></td>
         <td>master: Update README.md</td>
         <td>#1 passed</td>
         <td>Execution time: 29 sec</td>
