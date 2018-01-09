@@ -40,7 +40,7 @@ $routes = [
   ],
   [
     'method' => 'GET',
-    'path' => '/projects/:owner/:project',
+    'path' => '/projects/:owner/:project/builds/:id',
     'callback' => 'project'
   ]
 ];
@@ -167,6 +167,6 @@ function home() {
 /**
  * Project page
  */
-function project($owner, $project) {
+function project($owner, $project, $build) {
   include __DIR__ . '/views/project.php';
 }
