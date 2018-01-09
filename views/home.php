@@ -11,11 +11,11 @@
   <input type="text" class=".input" placeholder="Search projects ..." autofocus/>
   
   <ul class="list-group">
-    <li class="list-group-item"><a href="/projects/symfony/yaml/builds/current">symfony/yaml</a></li>
-    <li class="list-group-item"><a href="/projects/psy/psysh/builds/current">psy/psysh</a></li>
-    <li class="list-group-item"><a href="/projects/block8/phpci/builds/current">block8/phpci</a></li>
-    <li class="list-group-item"><a href="/projects/phpstan/phpstan/builds/current">phpstan/phpstan</a></li>
-    <li class="list-group-item"><a href="/projects/squizlabs/php_codesniffer/builds/current">squizlabs/php_codesniffer</a></li>
+    <li class="list-group-item"><a href="/projects/symfony/yaml/builds/5">symfony/yaml</a></li>
+    <li class="list-group-item"><a href="/projects/psy/psysh/builds/4">psy/psysh</a></li>
+    <li class="list-group-item"><a href="/projects/block8/phpci/builds/3">block8/phpci</a></li>
+    <li class="list-group-item"><a href="/projects/phpstan/phpstan/builds/2">phpstan/phpstan</a></li>
+    <li class="list-group-item"><a href="/projects/squizlabs/php_codesniffer/builds/1">squizlabs/php_codesniffer</a></li>
   </ul>
 </body>
 </html>
