@@ -19,7 +19,7 @@
         <td>6 days ago</td>
       </tr>
       <tr>
-        <td>
+        <td valign="top">
           <ul class="list-group">
             <li class="list-group-item passed">master <a href="/projects/<?= $owner.'/'.$project; ?>/builds/5">#5</a></li>
             <li class="list-group-item failed">v1.0.1 <a href="/projects/<?= $owner.'/'.$project; ?>/builds/4">#4</a></li>
