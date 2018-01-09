@@ -6,6 +6,16 @@ declare(strict_types = 1);
 // psr-4 autoloader
 require __DIR__ . '/vendor/autoload.php';
 
+// 0) Init SQLITE pdo instance
+try{
+    $pdo = new PDO('sqlite:'.dirname(__FILE__).'/data/pci.sqlite');
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // ERRMODE_WARNING | ERRMODE_EXCEPTION | ERRMODE_SILENT
+} catch(Exception $e) {
+    echo "Cannot access to sqlite database : ".$e->getMessage();
+    die();
+}
+
 // 1) Routes
 $routes = [
   [
@@ -22,6 +32,16 @@ $routes = [
     'method' => 'GET',
     'path' => '/status/:sha',
     'callback' => 'status'
+  ],
+  [
+    'method' => 'GET',
+    'path' => '/',
+    'callback' => 'home'
+  ],
+  [
+    'method' => 'GET',
+    'path' => '/projects/:owner/:project',
+    'callback' => 'project'
   ]
 ];
 
@@ -135,4 +155,18 @@ function error($code, $message) {
           'error' => $message
       ]
   );
+}
+
+/**
+ * Home page
+ */
+function home() {
+  include __DIR__ . '/views/home.php';
+}
+
+/**
+ * Project page
+ */
+function project($owner, $project) {
+  include __DIR__ . '/views/project.php';
 }
