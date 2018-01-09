@@ -1,0 +1,53 @@
+{
+	"variables": [],
+	"info": {
+		"name": "PCI",
+		"_postman_id": "09b50747-bbbf-a8ea-1637-0727ede04b55",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "BUILD",
+			"request": {
+				"url": "localhost:9001/build",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"id\": 4458399707,\n\t\"sha\": \"1c844bac2dbb5814242be1cb1a45594e42180718\",\n\t\"name\": \"dridi-walid/micro-framework-skeleton\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "OUTPUT",
+			"request": {
+				"url": "localhost:9001/output/1c844bac2dbb5814242be1cb1a45594e42180718",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "STATUS",
+			"request": {
+				"url": "localhost:9001/status/1c844bac2dbb5814242be1cb1a45594e42180718",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
