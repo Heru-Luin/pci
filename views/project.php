@@ -14,7 +14,7 @@
       <tr>
         <td><span><?= $owner.'/'.$project; ?></span> <img src="/assets/passing.svg" /> <img src="/assets/reload.png" /></td>
         <td>master: Update README.md</td>
-        <td>#1 passed</td>
+        <td>#<?= $build;?> passed</td>
         <td>Execution time: 29 sec</td>
         <td>6 days ago</td>
       </tr>
