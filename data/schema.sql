@@ -3,7 +3,8 @@ CREATE TABLE `project` (
   `name` varchar(255) NOT NULL,
   `full_name` varchar(255) NOT NULL,
   `description` TEXT,
-  `owner_login` varchar(255) NOT NULL
+  `owner_login` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL
 );
 
 CREATE TABLE `build` (
