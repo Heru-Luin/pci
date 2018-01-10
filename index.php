@@ -8,9 +8,10 @@ require __DIR__ . '/vendor/autoload.php';
 
 // 0) Init SQLITE pdo instance
 try{
+    global $pdo;
     $pdo = new PDO('sqlite:'.dirname(__FILE__).'/data/pci.sqlite');
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // ERRMODE_WARNING | ERRMODE_EXCEPTION | ERRMODE_SILENT
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // ERRMODE_WARNING | ERRMODE_EXCEPTION | ERRMODE_SILENT    
 } catch(Exception $e) {
     echo "Cannot access to sqlite database : ".$e->getMessage();
     die();
@@ -166,6 +167,12 @@ function error($code, $message) {
  * Home page
  */
 function home() {
+  global $pdo;
+  
+  $stmt = $pdo->prepare("SELECT * FROM project");
+  $stmt->execute();
+  $projects = $stmt->fetchAll();
+
   include __DIR__ . '/views/home.php';
 }
 

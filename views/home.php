@@ -11,11 +11,9 @@
   <input type="text" class=".input" placeholder="Search projects ..." autofocus/>
   
   <ul class="list-group">
-    <li class="list-group-item"><a href="/projects/symfony/yaml/builds/5">symfony/yaml</a></li>
-    <li class="list-group-item"><a href="/projects/psy/psysh/builds/4">psy/psysh</a></li>
-    <li class="list-group-item"><a href="/projects/block8/phpci/builds/3">block8/phpci</a></li>
-    <li class="list-group-item"><a href="/projects/phpstan/phpstan/builds/2">phpstan/phpstan</a></li>
-    <li class="list-group-item"><a href="/projects/squizlabs/php_codesniffer/builds/1">squizlabs/php_codesniffer</a></li>
+    <?php foreach($projects as $project) {?>
+    <li class="list-group-item"><a href="/projects/<?= $project['full_name'];?>/builds/5"><?= $project['full_name'];?></a></li>
+    <?php } ?>
   </ul>
 </body>
 </html>
