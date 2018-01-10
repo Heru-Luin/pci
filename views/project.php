@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>PCI - PHP Continuous Integration Tool</title>
   <link rel="stylesheet" href="/assets/style.css">
+  <script src="/assets/jquery-3.2.1.min.js"></script>
   <script src="/assets/script.js"></script>
 </head>
 <body>
