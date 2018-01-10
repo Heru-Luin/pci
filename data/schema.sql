@@ -14,6 +14,8 @@ CREATE TABLE `build` (
   `sha` varchar(255) NOT NULL,
   `commit` TEXT NOT NULL,
   `payload` TEXT NOT NULL,
+  `delivery` varchar(255) NOT NULL,
+  `event` varchar(255) NOT NULL,
   `output` TEXT NOT NULL,
   `status` INTEGER DEFAULT 0 NOT NULL,  
   `execution_time` INTEGER NOT NULL,
