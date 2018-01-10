@@ -42,6 +42,11 @@ $routes = [
     'method' => 'GET',
     'path' => '/projects/:owner/:project/builds/:id',
     'callback' => 'project'
+  ],
+  [
+    'method' => 'DELETE',
+    'path' => '/projects/:token',
+    'callback' => 'delete_project'
   ]
 ];
 
@@ -169,4 +174,11 @@ function home() {
  */
 function project($owner, $project, $build) {
   include __DIR__ . '/views/project.php';
+}
+
+/**
+ * Delete project based on its token
+ */
+function delete_project($token) {
+  error(501, 'Not yet implemented');
 }
