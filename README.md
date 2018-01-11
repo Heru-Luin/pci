@@ -41,3 +41,5 @@ make GET request with commit hash
 make GET request with commit hash
 
   	GET localhost:9001/status/1c844bac2dbb5814242be1cb1a45594e42180718
+
+PCI project is online at http://52.28.188.226 and frequently updated
