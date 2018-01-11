@@ -10,8 +10,7 @@ If your bug / question remains unanswered in gitter, please open an Issue – ot
 ### Installation
 
     composer create-project dridi-walid/pci:dev-master
-    or
-    git clone https://github.com/dridi-walid/pci.git &&cd pci&&composer install
+    git clone https://github.com/dridi-walid/pci.git && cd pci && composer install
 
 ### Run built-in php web server
 
