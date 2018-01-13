@@ -95,6 +95,48 @@ if (!$match) {
  */
 function build() {
   $raw = file_get_contents("php://input");
+  
+  $payload = json_decode($raw, true);
+  
+  global $pdo; 
+  
+  // Save project is it's not already configured
+  $stmt = $pdo->prepare("SELECT COUNT(1) AS count FROM project WHERE full_name = '".$payload['repository']['full_name']."'");
+  $stmt->execute();
+  $result = $stmt->fetch();
+  
+  if (! (int) $result['count']) {
+    try {
+      $stmt = $pdo->prepare("INSERT INTO project VALUES (null, ?, ?, ? , ?, ?)");
+      
+      $stmt->execute([
+        $payload['repository']['name'],
+        $payload['repository']['full_name'],
+        $payload['repository']['description'],
+        $payload['repository']['owner']['login'],
+        uuid()
+      ]);  
+      
+      send(200, 'Project configurated!');
+    } catch(\Exception $e) {
+      switch($e->getCode()) {
+        case '23000':
+          send(500, 'The project is already configured');
+          break;
+        default;
+          send(500, $e->getMessage());   
+      }    
+    }
+  }
+  
+  // Save build
+  var_dump('save build'); exit;
+  
+  
+}
+
+function build_() {
+  $raw = file_get_contents("php://input");
         
   $payload = json_decode($raw, true); 
   $project = 'https://github.com/'.$payload['name'].'.git';
@@ -125,7 +167,7 @@ function output($sha) {
     header('Content-Type: text/plain');
     readfile('workspace/'.$sha.'/output_console.txt');
   } else {   
-    error(400, 'Output log not found');
+    send(400, 'Output log not found');
   }
 }
 
@@ -153,12 +195,12 @@ function status($sha) {
  *
  * @return void
  */
-function error($code, $message) {
+function send($code, $message) {
   http_response_code($code);
   header('Content-Type: application/json');
   echo json_encode(
       [
-          'error' => $message
+          'message' => $message
       ]
   );
 }
@@ -187,5 +229,30 @@ function project($owner, $project, $build) {
  * Delete project based on its token
  */
 function delete_project($token) {
-  error(501, 'Not yet implemented');
+  send(501, 'Not yet implemented');
+}
+
+/**
+ * Return uuid
+ */
+function uuid() {
+    return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+        // 32 bits for "time_low"
+        mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
+
+        // 16 bits for "time_mid"
+        mt_rand( 0, 0xffff ),
+
+        // 16 bits for "time_hi_and_version",
+        // four most significant bits holds version number 4
+        mt_rand( 0, 0x0fff ) | 0x4000,
+
+        // 16 bits, 8 bits for "clk_seq_hi_res",
+        // 8 bits for "clk_seq_low",
+        // two most significant bits holds zero and one for variant DCE1.1
+        mt_rand( 0, 0x3fff ) | 0x8000,
+
+        // 48 bits for "node"
+        mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
+    );
 }

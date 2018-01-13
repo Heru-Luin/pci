@@ -1,7 +1,7 @@
 CREATE TABLE `project` (
   `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   `name` varchar(255) NOT NULL,
-  `full_name` varchar(255) NOT NULL,
+  `full_name` varchar(255) NOT NULL UNIQUE,
   `description` TEXT,
   `owner_login` varchar(255) NOT NULL,
   `token` varchar(255) NOT NULL
