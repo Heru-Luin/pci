@@ -1,24 +1,15 @@
-CREATE TABLE `project` (
-  `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  `name` varchar(255) NOT NULL,
-  `full_name` varchar(255) NOT NULL UNIQUE,
-  `description` TEXT,
-  `owner_login` varchar(255) NOT NULL,
-  `token` varchar(255) NOT NULL
+CREATE TABLE `repository` (
+  `id` VARCHAR(255) NOT NULL PRIMARY KEY,
+  `token` VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE `build` (
-  `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  `project_id` INTEGER NOT NULL,
-  `branch` varchar(255) NOT NULL,
-  `sha` varchar(255) NOT NULL,
-  `commit` TEXT NOT NULL,
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `repository_id` VARCHAR(255) NOT NULL,
   `payload` TEXT NOT NULL,
-  `delivery` varchar(255) NOT NULL,
-  `event` varchar(255) NOT NULL,
   `output` TEXT NOT NULL,
-  `status` INTEGER DEFAULT 0 NOT NULL,  
+  `status` INTEGER DEFAULT 0 NOT NULL,
   `execution_time` INTEGER NOT NULL,
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (`project_id`) REFERENCES `project` (`id`)
+  FOREIGN KEY (`repository_id`) REFERENCES `repository` (`id`)
 );

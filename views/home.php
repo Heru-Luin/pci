@@ -12,8 +12,9 @@
   <input type="text" id="search" class=".input" placeholder="Search projects ..." autofocus/>
   
   <ul class="list-group" id="projects">
-    <?php foreach($projects as $project) {?>
-    <li class="list-group-item"><a href="/projects/<?= $project['full_name'];?>/builds/5"><?= $project['full_name'];?></a></li>
+    <?php 
+    foreach($repositories as $repository) {?>
+    <li class="list-group-item"><a href="/projects/<?= $project['id'];?>/builds/5"><?= $project['id'];?></a></li>
     <?php } ?>
   </ul>
 </body>

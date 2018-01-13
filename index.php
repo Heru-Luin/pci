@@ -94,44 +94,118 @@ if (!$match) {
  * @return void
  */
 function build() {
+  global $pdo;
+       
+  // HOST whitelist
+  $whitelist_hostname = ['localhost', 'http://github.com'];
+  
+  if (!in_array($_SERVER['SERVER_NAME'], $whitelist_hostname)) {
+    send(401, ['error' => $_SERVER['SERVER_NAME'] . ' is not supported yet!']);
+    exit;
+  }
+  
   $raw = file_get_contents("php://input");
   
-  $payload = json_decode($raw, true);
-  
-  global $pdo; 
+  $payload = json_decode($raw, true);   
   
   // Save project is it's not already configured
-  $stmt = $pdo->prepare("SELECT COUNT(1) AS count FROM project WHERE full_name = '".$payload['repository']['full_name']."'");
+  $stmt = $pdo->prepare("SELECT COUNT(1) AS count, id, token FROM repository WHERE id = '" . $payload['repository']['full_name'] . "'");
   $stmt->execute();
   $result = $stmt->fetch();
   
-  if (! (int) $result['count']) {
+  $projectId = null;
+  $token = null;
+  
+  if ((int) $result['count']) {
+    $projectId = $result['id'];
+    $token = $result['token'];
+  } else {
     try {
-      $stmt = $pdo->prepare("INSERT INTO project VALUES (null, ?, ?, ? , ?, ?)");
+      $stmt = $pdo->prepare("INSERT INTO repository VALUES (?, ?)");
+      
+      $token = uuid();
       
       $stmt->execute([
-        $payload['repository']['name'],
         $payload['repository']['full_name'],
-        $payload['repository']['description'],
-        $payload['repository']['owner']['login'],
-        uuid()
-      ]);  
+        $token
+      ]);   
       
-      send(200, 'Project configurated!');
+      $projectId = $pdo->lastInsertId();           
     } catch(\Exception $e) {
-      switch($e->getCode()) {
-        case '23000':
-          send(500, 'The project is already configured');
-          break;
-        default;
-          send(500, $e->getMessage());   
-      }    
+      send(500, ['error' => $e->getMessage()]);
     }
   }
   
-  // Save build
-  var_dump('save build'); exit;
+  // Run build
+  $output = "Buildfile: /home/server/www/pci/workspace/1c844bac2dbb5814242be1cb1a45594e42180718/build.xml
+
+TOKEN > prepare:
+
+     [echo] Making directory ./build
+    [mkdir] Created dir: /home/server/www/pci/workspace/1c844bac2dbb5814242be1cb1a45594e42180718/build
+
+TOKEN > build:
+
+..... 5 / 5 (100%)
+
+
+Time: 201ms; Memory: 6Mb
+
+PHPUnit 6.5.5 by Sebastian Bergmann and contributors.
+
+....                                                                4 / 4 (100%)
+
+Time: 298 ms, Memory: 6.00MB
+
+OK (4 tests, 4 assertions)
+
+Generating code coverage report in Clover XML format ... done
+
+Generating code coverage report in HTML format ... done
+
+Generating code coverage report in PHP format ... done
+
+
+[1;37;40mCode Coverage Report:     [0m
+[1;37;40m  2018-01-09 21:44:29     [0m
+[1;37;40m                          [0m
+[1;37;40m Summary:                 [0m
+[30;42m  Classes: 100.00% (4/4)  [0m
+[30;42m  Methods: 100.00% (6/6)  [0m
+[30;42m  Lines:   100.00% (14/14)[0m
+
+\Command::Command\RandomInteger
+  [30;42mMethods: 100.00% ( 2/ 2)[0m   [30;42mLines: 100.00% (  9/  9)[0m
+\Middleware::Middleware\XContentTypeOptions
+  [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% (  1/  1)[0m
+\Middleware::Middleware\XssProtection
+  [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% (  1/  1)[0m
+\Service::Service\Crypto
+  [30;42mMethods: 100.00% ( 2/ 2)[0m   [30;42mLines: 100.00% (  3/  3)[0m
+
+BUILD FINISHED
+
+Total time: 0.7801 seconds";
+
+  $status = 1;
   
+  // Save build
+   try {
+    $stmt = $pdo->prepare("INSERT INTO build VALUES (?, ?, ?, ?, ?, ?, ?)");
+    
+    $stmt->execute([
+      $payload['id'],
+      $projectId,
+      $raw,
+      $output,
+      $status,
+      49
+    ]);  
+    
+    send(200, ['token' => $token]);  
+  } catch(\Exception $e) {
+    send(500, ['error' => $e->getMessage()]);
+  }
   
 }
 
@@ -167,7 +241,7 @@ function output($sha) {
     header('Content-Type: text/plain');
     readfile('workspace/'.$sha.'/output_console.txt');
   } else {   
-    send(400, 'Output log not found');
+    send(400, ['error' => 'Output log not found']);
   }
 }
 
@@ -198,11 +272,7 @@ function status($sha) {
 function send($code, $message) {
   http_response_code($code);
   header('Content-Type: application/json');
-  echo json_encode(
-      [
-          'message' => $message
-      ]
-  );
+  echo json_encode($message);
 }
 
 /**
@@ -211,9 +281,9 @@ function send($code, $message) {
 function home() {
   global $pdo;
   
-  $stmt = $pdo->prepare("SELECT * FROM project");
+  $stmt = $pdo->prepare("SELECT * FROM repository");
   $stmt->execute();
-  $projects = $stmt->fetchAll();
+  $repositories = $stmt->fetchAll();
 
   include __DIR__ . '/views/home.php';
 }
@@ -229,30 +299,26 @@ function project($owner, $project, $build) {
  * Delete project based on its token
  */
 function delete_project($token) {
-  send(501, 'Not yet implemented');
+  send(501, ['error' => 'Not yet implemented']);
 }
 
 /**
  * Return uuid
  */
 function uuid() {
-    return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-        // 32 bits for "time_low"
-        mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
-
-        // 16 bits for "time_mid"
-        mt_rand( 0, 0xffff ),
-
-        // 16 bits for "time_hi_and_version",
-        // four most significant bits holds version number 4
-        mt_rand( 0, 0x0fff ) | 0x4000,
-
-        // 16 bits, 8 bits for "clk_seq_hi_res",
-        // 8 bits for "clk_seq_low",
-        // two most significant bits holds zero and one for variant DCE1.1
-        mt_rand( 0, 0x3fff ) | 0x8000,
-
-        // 48 bits for "node"
-        mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
-    );
+  return sprintf( '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+    // 32 bits for "time_low"
+    mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ),
+    // 16 bits for "time_mid"
+    mt_rand( 0, 0xffff ),
+    // 16 bits for "time_hi_and_version",
+    // four most significant bits holds version number 4
+    mt_rand( 0, 0x0fff ) | 0x4000,
+    // 16 bits, 8 bits for "clk_seq_hi_res",
+    // 8 bits for "clk_seq_low",
+    // two most significant bits holds zero and one for variant DCE1.1
+    mt_rand( 0, 0x3fff ) | 0x8000,
+    // 48 bits for "node"
+    mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff ), mt_rand( 0, 0xffff )
+  );
 }
