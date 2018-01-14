@@ -228,10 +228,11 @@ function home() {
   global $pdo;
   
   $stmt = $pdo->prepare("
-    SELECT repository.*, MAX(build.id) AS build_id, build.sha
+    SELECT 	repository.* , build.id as build_id, build.sha, MAX(build.created_at)
     FROM repository
-    INNER JOIN build
-	    ON repository.id = build.repository_id
+    INNER JOIN build	
+	    ON	 build.repository_id = repository.id
+    GROUP BY repository.id
   ");
   $stmt->execute();
   $repositories = $stmt->fetchAll();
