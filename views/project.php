@@ -21,7 +21,8 @@
       </tr>
       <tr>
         <td valign="top">
-          <ul class="list-group">            
+          <input type="text" id="search-build" class=".input" placeholder="Search builds ..." autofocus/>
+          <ul class="list-group" id="builds">            
             <?php foreach($history as $row){?>
               <li class="list-group-item <?php $status = 'passed'; if ((int) $row['status'] === 2) $status = 'failed'; echo $status;  ?>">master <a href="/projects/<?= $owner.'/'.$project; ?>/builds/<?=$row['sha'];?>">#<?=$row['sha'];?></a></li>
             <?php } ?>
