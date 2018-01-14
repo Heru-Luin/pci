@@ -155,9 +155,10 @@ function build() {
   
   // Save build
    try {
-    $stmt = $pdo->prepare("INSERT INTO build VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO build VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     
     $stmt->execute([
+      null,
       $payload['head_commit']['id'],
       $projectId,
       $raw,
@@ -227,7 +228,7 @@ function home() {
   global $pdo;
   
   $stmt = $pdo->prepare("
-    SELECT repository.*, MAX(build.id) AS build_id
+    SELECT repository.*, MAX(build.id) AS build_id, build.sha
     FROM repository
     INNER JOIN build
 	    ON repository.id = build.repository_id
@@ -247,7 +248,7 @@ function project($owner, $project, $build) {
   $stmt = $pdo->prepare("
     SELECT * 
     FROM build 
-    WHERE id = ?
+    WHERE sha = ?
   ");
   $stmt->execute([$build]);
   $build = $stmt->fetch();

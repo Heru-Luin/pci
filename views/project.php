@@ -15,14 +15,14 @@
       <tr>
         <td><span><?= $owner.'/'.$project; ?></span> <img src="/assets/<?php $status = 'passed'; if ((int) $build['status'] === 2) $status = 'failed'; echo $status;  ?>.svg" />
         <td><?= $build['payload']['ref'];?>: <?= $build['payload']['head_commit']['message'];?></td>
-        <td>#<?= $build['id'];?> passed</td>
+        <td>#<?= $build['sha'];?> passed</td>
         <td>Execution time: <?= $build['execution_time'];?> sec</td>
         <td><?=$build['created_at'];?></td>
       </tr>
       <tr>
         <td valign="top">
           <ul class="list-group">
-            <li class="list-group-item <?php $status = 'passed'; if ((int) $build['status'] === 2) $status = 'failed'; echo $status;  ?>">master <a href="/projects/<?= $owner.'/'.$project; ?>/builds/<?=$build['id'];?>">#<?=$build['id'];?></a></li>
+            <li class="list-group-item <?php $status = 'passed'; if ((int) $build['status'] === 2) $status = 'failed'; echo $status;  ?>">master <a href="/projects/<?= $owner.'/'.$project; ?>/builds/<?=$build['sha'];?>">#<?=$build['sha'];?></a></li>
           </ul>
         </td>
         <td colspan="4" class="console">

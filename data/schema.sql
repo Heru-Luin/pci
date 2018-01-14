@@ -5,7 +5,8 @@ CREATE TABLE `repository` (
 );
 
 CREATE TABLE `build` (
-  `id` VARCHAR(255) NOT NULL PRIMARY KEY,
+  `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  `sha` VARCHAR(255) NOT NULL,
   `repository_id` INTEGER NOT NULL,
   `payload` TEXT NOT NULL,
   `output` TEXT NOT NULL,
