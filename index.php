@@ -97,7 +97,7 @@ function build() {
   global $pdo;
        
   // HOST whitelist
-  $whitelist_hostname = ['localhost', 'http://github.com'];
+  $whitelist_hostname = ['_', 'localhost', 'http://github.com'];
   
   if (!in_array($_SERVER['SERVER_NAME'], $whitelist_hostname)) {
     send(401, ['error' => $_SERVER['SERVER_NAME'] . ' is not supported yet!']);
