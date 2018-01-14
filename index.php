@@ -253,7 +253,18 @@ function project($owner, $project, $build) {
   $stmt->execute([$build]);
   $build = $stmt->fetch();
   
-  $build['payload'] = json_decode($build['payload'], true);  
+  $build['payload'] = json_decode($build['payload'], true); 
+  
+  $stmt = $pdo->prepare("
+    SELECT * 
+    FROM build 
+    WHERE repository_id = ?
+    ORDER BY created_at DESC
+  ");
+  $stmt->execute([$build['repository_id']]);
+  
+  $history = $stmt->fetchAll(); 
+  
   
   include __DIR__ . '/views/project.php';
 }

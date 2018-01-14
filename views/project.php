@@ -21,8 +21,10 @@
       </tr>
       <tr>
         <td valign="top">
-          <ul class="list-group">
-            <li class="list-group-item <?php $status = 'passed'; if ((int) $build['status'] === 2) $status = 'failed'; echo $status;  ?>">master <a href="/projects/<?= $owner.'/'.$project; ?>/builds/<?=$build['sha'];?>">#<?=$build['sha'];?></a></li>
+          <ul class="list-group">            
+            <?php foreach($history as $row){?>
+              <li class="list-group-item <?php $status = 'passed'; if ((int) $row['status'] === 2) $status = 'failed'; echo $status;  ?>">master <a href="/projects/<?= $owner.'/'.$project; ?>/builds/<?=$row['sha'];?>">#<?=$row['sha'];?></a></li>
+            <?php } ?>
           </ul>
         </td>
         <td colspan="4" class="console">
