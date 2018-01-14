@@ -109,7 +109,7 @@ function build() {
   $payload = json_decode($raw, true);   
   
   // Save project is it's not already configured
-  $stmt = $pdo->prepare("SELECT COUNT(1) AS count, id, token FROM repository WHERE id = '" . $payload['repository']['full_name'] . "'");
+  $stmt = $pdo->prepare("SELECT COUNT(1) AS count, id, full_name, token FROM repository WHERE id = '" . $payload['repository']['id'] . "'");
   $stmt->execute();
   $result = $stmt->fetch();
   
@@ -121,24 +121,25 @@ function build() {
     $token = $result['token'];
   } else {
     try {
-      $stmt = $pdo->prepare("INSERT INTO repository VALUES (?, ?)");
+      $stmt = $pdo->prepare("INSERT INTO repository VALUES (?, ?, ?)");
       
       $token = uuid();
       
       $stmt->execute([
+        $payload['repository']['id'],
         $payload['repository']['full_name'],
         $token
       ]);   
       
-      $projectId = $pdo->lastInsertId();           
+      $projectId = $payload['repository']['id'];           
     } catch(\Exception $e) {
       send(500, ['error' => $e->getMessage()]);
     }
   }
   
   // Run build
-  $project = 'https://github.com/'.$payload['name'].'.git';
-  $sha = $payload['sha'];
+  $project = 'https://github.com/'.$payload['repository']['full_name'].'.git';
+  $sha = $payload['head_commit']['id'];
   $command = './build.sh ' . $project . ' ' . $sha; 
   
   set_time_limit(0);
@@ -148,6 +149,8 @@ function build() {
   $status = 0;  
   if ((int) $return_var === 0) {    
     $status = 1;
+  } else {
+    $status = 2;
   }
   
   // Save build
@@ -155,7 +158,7 @@ function build() {
     $stmt = $pdo->prepare("INSERT INTO build VALUES (?, ?, ?, ?, ?, ?, ?)");
     
     $stmt->execute([
-      $payload['id'],
+      $payload['head_commit']['id'],
       $projectId,
       $raw,
       $output,
@@ -169,26 +172,6 @@ function build() {
     send(500, ['error' => $e->getMessage()]);
   }
   
-}
-
-function build_() {
-  $raw = file_get_contents("php://input");
-        
-  $payload = json_decode($raw, true); 
-  $project = 'https://github.com/'.$payload['name'].'.git';
-  $sha = $payload['sha'];
-  $command = './build.sh ' . $project . ' ' . $sha;
-  
-  exec($command, $output, $return_var);
-  
-  if ((int) $return_var === 0) {        
-    // Passing
-    file_put_contents('workspace/'.$sha.'/status.svg', '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="88" height="20"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="88" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path fill="#555" d="M0 0h37v20H0z"/><path fill="#4c1" d="M37 0h51v20H37z"/><path fill="url(#b)" d="M0 0h88v20H0z"/></g><g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="110"><text x="195" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="270">build</text><text x="195" y="140" transform="scale(.1)" textLength="270">build</text><text x="615" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="410">passing</text><text x="615" y="140" transform="scale(.1)" textLength="410">passing</text></g> </svg>');
-  } else {
-    // Failure
-    file_put_contents('workspace/'.$sha.'/status.svg', '
-    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="82" height="20"><linearGradient id="b" x2="0" y2="100%"><stop offset="0" stop-color="#bbb" stop-opacity=".1"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="a"><rect width="82" height="20" rx="3" fill="#fff"/></clipPath><g clip-path="url(#a)"><path fill="#555" d="M0 0h37v20H0z"/><path fill="#e05d44" d="M37 0h45v20H37z"/><path fill="url(#b)" d="M0 0h82v20H0z"/></g><g fill="#fff" text-anchor="middle" font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="110"><text x="195" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="270">build</text><text x="195" y="140" transform="scale(.1)" textLength="270">build</text><text x="585" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="350">failure</text><text x="585" y="140" transform="scale(.1)" textLength="350">failure</text></g> </svg>');
-  }
 }
 
 /**
@@ -266,7 +249,7 @@ function project($owner, $project, $build) {
     FROM build 
     WHERE id = ?
   ");
-  $stmt->execute([(int) $build]);
+  $stmt->execute([$build]);
   $build = $stmt->fetch();
   
   $build['payload'] = json_decode($build['payload'], true);  

@@ -14,7 +14,7 @@
   <ul class="list-group" id="projects">
     <?php 
     foreach($repositories as $repository) {?>
-    <li class="list-group-item"><a href="/projects/<?= $repository['id'];?>/builds/<?=$repository['build_id'];?>"><?= $repository['id'];?></a></li>
+    <li class="list-group-item"><a href="/projects/<?= $repository['full_name'];?>/builds/<?=$repository['build_id'];?>"><?= $repository['full_name'];?></a></li>
     <?php } ?>
   </ul>
 </body>

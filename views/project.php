@@ -14,7 +14,7 @@
     <tbody>
       <tr>
         <td><span><?= $owner.'/'.$project; ?></span> <img src="/assets/<?php $status = 'passed'; if ((int) $build['status'] === 2) $status = 'failed'; echo $status;  ?>.svg" />
-        <td><?= $build['payload']['branches'][0]['name'];?>: <?= $build['payload']['commit']['commit']['message'];?></td>
+        <td><?= $build['payload']['ref'];?>: <?= $build['payload']['head_commit']['message'];?></td>
         <td>#<?= $build['id'];?> passed</td>
         <td>Execution time: <?= $build['execution_time'];?> sec</td>
         <td><?=$build['created_at'];?></td>
