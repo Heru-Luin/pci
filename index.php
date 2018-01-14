@@ -21,7 +21,7 @@ try{
 $routes = [
   [
     'method' => 'POST', 
-    'path' => '/build', 
+    'path' => '/github-webhook', 
     'callback' => 'build'
   ],
   [
