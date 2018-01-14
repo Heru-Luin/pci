@@ -140,7 +140,8 @@ function build() {
   $project = 'https://github.com/'.$payload['name'].'.git';
   $sha = $payload['sha'];
   $command = './build.sh ' . $project . ' ' . $sha; 
-
+  
+  set_time_limit(0);
   exec($command, $output, $return_var);
   
   $output = file_get_contents('workspace/'.$sha.'.log'); 
