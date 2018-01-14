@@ -76,7 +76,7 @@ foreach ($routes as $route) {
 
 // 4) If not route matches
 if (!$match) {  
-  error(400, sprintf('Unknown route: %s', $uri));
+  send(400, ['error' => sprintf('Unknown route: %s', $uri)]);
 }
 
 // Callables
@@ -137,57 +137,17 @@ function build() {
   }
   
   // Run build
-  $output = "Buildfile: /home/server/www/pci/workspace/1c844bac2dbb5814242be1cb1a45594e42180718/build.xml
+  $project = 'https://github.com/'.$payload['name'].'.git';
+  $sha = $payload['sha'];
+  $command = './build.sh ' . $project . ' ' . $sha; 
 
-TOKEN > prepare:
-
-     [echo] Making directory ./build
-    [mkdir] Created dir: /home/server/www/pci/workspace/1c844bac2dbb5814242be1cb1a45594e42180718/build
-
-TOKEN > build:
-
-..... 5 / 5 (100%)
-
-
-Time: 201ms; Memory: 6Mb
-
-PHPUnit 6.5.5 by Sebastian Bergmann and contributors.
-
-....                                                                4 / 4 (100%)
-
-Time: 298 ms, Memory: 6.00MB
-
-OK (4 tests, 4 assertions)
-
-Generating code coverage report in Clover XML format ... done
-
-Generating code coverage report in HTML format ... done
-
-Generating code coverage report in PHP format ... done
-
-
-[1;37;40mCode Coverage Report:     [0m
-[1;37;40m  2018-01-09 21:44:29     [0m
-[1;37;40m                          [0m
-[1;37;40m Summary:                 [0m
-[30;42m  Classes: 100.00% (4/4)  [0m
-[30;42m  Methods: 100.00% (6/6)  [0m
-[30;42m  Lines:   100.00% (14/14)[0m
-
-\Command::Command\RandomInteger
-  [30;42mMethods: 100.00% ( 2/ 2)[0m   [30;42mLines: 100.00% (  9/  9)[0m
-\Middleware::Middleware\XContentTypeOptions
-  [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% (  1/  1)[0m
-\Middleware::Middleware\XssProtection
-  [30;42mMethods: 100.00% ( 1/ 1)[0m   [30;42mLines: 100.00% (  1/  1)[0m
-\Service::Service\Crypto
-  [30;42mMethods: 100.00% ( 2/ 2)[0m   [30;42mLines: 100.00% (  3/  3)[0m
-
-BUILD FINISHED
-
-Total time: 0.7801 seconds";
-
-  $status = 1;
+  exec($command, $output, $return_var);
+  
+  $output = file_get_contents('workspace/'.$sha.'.log'); 
+  $status = 0;  
+  if ((int) $return_var === 0) {    
+    $status = 1;
+  }
   
   // Save build
    try {
@@ -199,7 +159,8 @@ Total time: 0.7801 seconds";
       $raw,
       $output,
       $status,
-      49
+      49,
+      date("Y-m-d H:i:s")
     ]);  
     
     send(200, ['token' => $token]);  
@@ -281,7 +242,12 @@ function send($code, $message) {
 function home() {
   global $pdo;
   
-  $stmt = $pdo->prepare("SELECT * FROM repository");
+  $stmt = $pdo->prepare("
+    SELECT repository.*, MAX(build.id) AS build_id
+    FROM repository
+    INNER JOIN build
+	    ON repository.id = build.repository_id
+  ");
   $stmt->execute();
   $repositories = $stmt->fetchAll();
 
@@ -292,6 +258,18 @@ function home() {
  * Project page
  */
 function project($owner, $project, $build) {
+  global $pdo;
+  
+  $stmt = $pdo->prepare("
+    SELECT * 
+    FROM build 
+    WHERE id = ?
+  ");
+  $stmt->execute([(int) $build]);
+  $build = $stmt->fetch();
+  
+  $build['payload'] = json_decode($build['payload'], true);  
+  
   include __DIR__ . '/views/project.php';
 }
 
