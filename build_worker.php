@@ -20,13 +20,11 @@ if ($pheanstalk->getConnection()->isServiceListening()) {
       ->ignore('default')
       ->reserve();
       
-    $data = $job->getData();
+    $data = unserialize($job->getData());    
     
-    $payload = $data['payload'];
-    
-    print_r($payload);
-    
-    
+    $projectId = $data['projectId'];
+    $raw = $data['raw'];
+    $payload = json_decode($raw, true);      
 
     // Run build
     $project = 'https://github.com/'.$payload['repository']['full_name'].'.git';
@@ -57,14 +55,11 @@ if ($pheanstalk->getConnection()->isServiceListening()) {
         $status,
         49,
         date("Y-m-d H:i:s")
-      ]);  
+      ]);
       
-      send(200, ['token' => $token]);  
+      $pheanstalk->delete($job);        
     } catch(\Exception $e) {
-      send(500, ['error' => $e->getMessage()]);
-    }
-    
-
-    $pheanstalk->delete($job);
+      print_r($e);
+    }      
   }
 }

@@ -99,7 +99,7 @@ if (!$match) {
  */
 function build() {
   
-  global $pheanstalk;    
+  global $pheanstalk;               
   global $pdo;
        
   // HOST whitelist
@@ -110,7 +110,7 @@ function build() {
     exit;
   }
   
-  $raw = file_get_contents("php://input");
+  $raw = file_get_contents("php://input");   
   
   $payload = json_decode($raw, true);   
   
@@ -137,17 +137,17 @@ function build() {
         $token
       ]);   
       
-      $projectId = $payload['repository']['id']; 
-      
-      $pheanstalk
-        ->useTube('build')
-        ->put("job payload goes here\n");     
-        
-      send(200, ['token' => $token]);      
+      $projectId = $payload['repository']['id'];                                
     } catch(\Exception $e) {
       send(500, ['error' => $e->getMessage()]);
     }
-  }      
+  }
+  
+  $pheanstalk
+    ->useTube('build')
+    ->put(serialize(['projectId' => $projectId, 'raw' => $raw]));  
+    
+  send(200, ['token' => $token]);         
 }
 
 /**
