@@ -4,7 +4,8 @@
     "description": "Php Continuous Integration Tool",
     "require": {
         "phpunit/phpunit": "^6.5",
-        "phing/phing": "^2.16"
+        "phing/phing": "^2.16",
+        "pda/pheanstalk": "^3.1"
     },
     "license": "MIT",
     "authors": [

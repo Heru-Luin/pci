@@ -6,6 +6,10 @@ declare(strict_types = 1);
 // psr-4 autoloader
 require __DIR__ . '/vendor/autoload.php';
 
+$pheanstalk = new \Pheanstalk\Pheanstalk('127.0.0.1');
+
+
+
 // 0) Init SQLITE pdo instance
 try{
     global $pdo;
@@ -94,6 +98,8 @@ if (!$match) {
  * @return void
  */
 function build() {
+  
+  global $pheanstalk;    
   global $pdo;
        
   // HOST whitelist
@@ -131,48 +137,17 @@ function build() {
         $token
       ]);   
       
-      $projectId = $payload['repository']['id'];           
+      $projectId = $payload['repository']['id']; 
+      
+      $pheanstalk
+        ->useTube('build')
+        ->put("job payload goes here\n");     
+        
+      send(200, ['token' => $token]);      
     } catch(\Exception $e) {
       send(500, ['error' => $e->getMessage()]);
     }
-  }
-  
-  // Run build
-  $project = 'https://github.com/'.$payload['repository']['full_name'].'.git';
-  $sha = $payload['head_commit']['id'];
-  $command = './build.sh ' . $project . ' ' . $sha; 
-  
-  set_time_limit(0);
-  exec($command, $output, $return_var);
-  
-  $output = file_get_contents('workspace/'.$sha.'.log'); 
-  $status = 0;  
-  if ((int) $return_var === 0) {    
-    $status = 1;
-  } else {
-    $status = 2;
-  }
-  
-  // Save build
-   try {
-    $stmt = $pdo->prepare("INSERT INTO build VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    
-    $stmt->execute([
-      null,
-      $payload['head_commit']['id'],
-      $projectId,
-      $raw,
-      $output,
-      $status,
-      49,
-      date("Y-m-d H:i:s")
-    ]);  
-    
-    send(200, ['token' => $token]);  
-  } catch(\Exception $e) {
-    send(500, ['error' => $e->getMessage()]);
-  }
-  
+  }      
 }
 
 /**
