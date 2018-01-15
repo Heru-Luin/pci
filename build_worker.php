@@ -14,52 +14,50 @@ try{
 $pheanstalk = new \Pheanstalk\Pheanstalk('127.0.0.1');
 
 if ($pheanstalk->getConnection()->isServiceListening()) {
-  while(true) {
-    $job = $pheanstalk
-      ->watch('build')
-      ->ignore('default')
-      ->reserve();
-      
-    $data = unserialize($job->getData());    
+  $job = $pheanstalk
+    ->watch('build')
+    ->ignore('default')
+    ->reserve();
     
-    $projectId = $data['projectId'];
-    $raw = $data['raw'];
-    $payload = json_decode($raw, true);      
+  $data = unserialize($job->getData());    
+  
+  $projectId = $data['projectId'];
+  $raw = $data['raw'];
+  $payload = json_decode($raw, true);      
 
-    // Run build
-    $project = 'https://github.com/'.$payload['repository']['full_name'].'.git';
-    $sha = $payload['head_commit']['id'];
-    $command = './build.sh ' . $project . ' ' . $sha; 
+  // Run build
+  $project = 'https://github.com/'.$payload['repository']['full_name'].'.git';
+  $sha = $payload['head_commit']['id'];
+  $command = '/bin/sh '.__DIR__.'/build.sh ' . $project . ' ' . $sha; 
+  
+  set_time_limit(0);
+  exec($command, $output, $return_var);
+  
+  $output = file_get_contents(__DIR__. '/workspace/'.$sha.'.log'); 
+  $status = 0;  
+  if ((int) $return_var === 0) {    
+    $status = 1;
+  } else {
+    $status = 2;
+  }
+  
+  // Save build
+   try {
+    $stmt = $pdo->prepare("INSERT INTO build VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     
-    set_time_limit(0);
-    exec($command, $output, $return_var);
+    $stmt->execute([
+      null,
+      $payload['head_commit']['id'],
+      $projectId,
+      $raw,
+      $output,
+      $status,
+      49,
+      date("Y-m-d H:i:s")
+    ]);
     
-    $output = file_get_contents('workspace/'.$sha.'.log'); 
-    $status = 0;  
-    if ((int) $return_var === 0) {    
-      $status = 1;
-    } else {
-      $status = 2;
-    }
-    
-    // Save build
-     try {
-      $stmt = $pdo->prepare("INSERT INTO build VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-      
-      $stmt->execute([
-        null,
-        $payload['head_commit']['id'],
-        $projectId,
-        $raw,
-        $output,
-        $status,
-        49,
-        date("Y-m-d H:i:s")
-      ]);
-      
-      $pheanstalk->delete($job);        
-    } catch(\Exception $e) {
-      print_r($e);
-    }      
+    $pheanstalk->delete($job);        
+  } catch(\Exception $e) {
+    print_r($e);
   }
 }
