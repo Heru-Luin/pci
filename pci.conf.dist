@@ -1,0 +1,7 @@
+[program:pci]
+command=/usr/bin/php ${HOME}/pci/build_worker.php
+numprocs=1
+autostart=true
+autorestart=true
+stdout_logfile=${HOME}/supervisor/log/stdout_pci.log
+stderr_logfile=${HOME}/supervisor/log/stderr_pci.log
