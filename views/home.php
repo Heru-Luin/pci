@@ -14,7 +14,7 @@
   <ul class="list-group" id="projects">
     <?php 
     foreach($repositories as $repository) {?>
-    <li class="list-group-item"><a href="/projects/<?= $repository['full_name'];?>/builds/<?=$repository['sha'];?>"><?= $repository['full_name'];?></a></li>
+    <li class="list-group-item"><a href="/projects/<?= $repository['full_name'];?>/builds/<?=$repository['sha'];?>"><?= $repository['full_name'];?></a> <img src="/assets/<?php $status = 'passed'; if ((int) $repository['status'] === 2) $status = 'failed'; echo $status;  ?>.svg" /></li>
     <?php } ?>
   </ul>
 </body>

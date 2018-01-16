@@ -203,7 +203,7 @@ function home() {
   global $pdo;
   
   $stmt = $pdo->prepare("
-    SELECT 	repository.* , build.id as build_id, build.sha, MAX(build.created_at)
+    SELECT 	repository.* , build.id as build_id, build.sha, MAX(build.created_at), build.status
     FROM repository
     INNER JOIN build	
 	    ON	 build.repository_id = repository.id
