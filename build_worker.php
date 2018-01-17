@@ -26,12 +26,16 @@ if ($pheanstalk->getConnection()->isServiceListening()) {
   $payload = json_decode($raw, true);      
 
   // Run build
+  $time_start = microtime(true); 
+  
   $project = 'https://github.com/'.$payload['repository']['full_name'].'.git';
   $sha = $payload['head_commit']['id'];
   $command = '/bin/sh '.__DIR__.'/build.sh ' . $project . ' ' . $sha; 
   
   set_time_limit(0);
   exec($command, $output, $return_var);
+  
+  $time_end = microtime(true);
   
   $output = file_get_contents(__DIR__. '/workspace/'.$sha.'.log'); 
   $status = 0;  
@@ -40,6 +44,8 @@ if ($pheanstalk->getConnection()->isServiceListening()) {
   } else {
     $status = 2;
   }
+  
+  $execution_time = $time_end - $time_start;
   
   // Save build
    try {
@@ -52,7 +58,7 @@ if ($pheanstalk->getConnection()->isServiceListening()) {
       $raw,
       $output,
       $status,
-      49,
+      (int) $execution_time,
       date("Y-m-d H:i:s")
     ]);
     
